@@ -3,19 +3,109 @@
 <head>
     <meta charset="utf-8">
     <title>Lobby</title>
+    <style>
+        .text-column {
+          width: 70%;
+          float: left;
+          margin: 0;
+        }
+        .comments-column {
+          width: 30%;
+          float: right;
+          margin: 0;
+        }
+        .highlight {
+          background-color: yellow;
+        }
+        .comments-column div {
+          border: 1px solid black;
+          padding: 10px;
+        }
+      </style>
 </head>
 <body>
     <h1>Let's chat!</h1>
+    <div id="passage">
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
+            velit ipsum, pulvinar vel nisl vel, congue fringilla elit.
+        </p>
+        <button id="highlight-button">Highlight</button>
+        <button id="cancel-highlight-button">Cancel Highlight</button>
+    </div>
+    <div class="comments-column">
+
+    </div>
 
     <form id="form">
         <input type="text" name="message"/>
     </form>
-
+    
     <div id="messages">
 
     </div>
 
     <script type="text/javascript">
+      var highlightCounter = 1;
+      const highlightButton = document.querySelector("#highlight-button");
+      const cancelHighlightButton = document.querySelector(
+        "#cancel-highlight-button"
+      );
+      const paragraphs = document.querySelectorAll("p");
+
+      const commentsColumn = document.querySelector(".comments-column");
+
+      highlightButton.addEventListener("click", function() {
+        const selectedText = window.getSelection().toString();
+        if (selectedText) {
+          paragraphs.forEach(function(paragraph) {
+            let text = paragraph.innerHTML;
+            const newHTML = text.replace(
+              selectedText,
+              `<span class="highlight" id="${highlightCounter}" onclick="addComment('${highlightCounter}')">${selectedText}</span>`
+            );
+            paragraph.innerHTML = newHTML;
+            highlightCounter++;
+
+
+            chatSocket.send(JSON.stringify({
+                'type': 'highlight',
+                'article': newHTML,
+                'highlightCnt': highlightCounter - 1
+            }))
+
+          });
+        }
+      });
+
+      cancelHighlightButton.addEventListener("click", function() {
+        paragraphs.forEach(function(paragraph) {
+          paragraph.innerHTML = paragraph.textContent;
+        });
+        commentsColumn.innerHTML = "";
+        highlightCounter = 1;
+      });
+
+      function addComment(id) {
+        var commentDiv = document.createElement("div");
+        commentDiv.id = `comment${id}`;
+        commentDiv.innerHTML = `
+          <textarea placeholder="Enter your comment here"></textarea>
+          <button onclick="submitComment('${id}')">Submit</button>
+        `;
+        commentsColumn.appendChild(commentDiv);
+      }
+
+      function submitComment(id) {
+        var commentDiv = document.getElementById(`comment${id}`);
+        console.log(commentDiv)
+        var comment = commentDiv.querySelector("textarea").value;
+        commentDiv.innerHTML = comment;
+      }
+
+
+
+
         let url = `ws://${window.location.host}/ws/socket-server/`
 
         const chatSocket = new WebSocket(url)
@@ -31,6 +121,9 @@
                         <p>${data.message}</p>
                     </div>`)
             }
+            else if (data.type === 'article') {
+                console.log('received article!')
+            }
         }
 
         let form = document.getElementById('form')
@@ -38,6 +131,7 @@
             e.preventDefault()
             let message = e.target.message.value
             chatSocket.send(JSON.stringify({
+                'type': 'chat',
                 'message': message
             }))
             form.reset()

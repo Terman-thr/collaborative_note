@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .text-column {
+        width: 70%;
+        float: left;
+        margin: 0;
+      }
+      .comments-column {
+        width: 30%;
+        float: right;
+        margin: 0;
+      }
+      .highlight {
+        background-color: yellow;
+      }
+      .comments-column div {
+        border: 1px solid black;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="text-column">
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
+        velit ipsum, pulvinar vel nisl vel, congue fringilla elit.
+      </p>
+    <button id="highlight-button">Highlight</button>
+    <button id="cancel-highlight-button">Cancel Highlight</button>
+    </div>
+    <div class="comments-column">
+
+    </div>
+    <script>
+
+      var highlightCounter = 1;
+      const highlightButton = document.querySelector("#highlight-button");
+      const cancelHighlightButton = document.querySelector(
+        "#cancel-highlight-button"
+      );
+      const paragraphs = document.querySelectorAll("p");
+
+      const commentsColumn = document.querySelector(".comments-column");
+
+      highlightButton.addEventListener("click", function() {
+        const selectedText = window.getSelection().toString();
+        if (selectedText) {
+          paragraphs.forEach(function(paragraph) {
+            let text = paragraph.innerHTML;
+            const newHTML = text.replace(
+              selectedText,
+              `<span class="highlight" id="${highlightCounter}" onclick="addComment('${highlightCounter}')">${selectedText}</span>`
+            );
+            paragraph.innerHTML = newHTML;
+            highlightCounter++;
+          });
+        }
+      });
+
+      cancelHighlightButton.addEventListener("click", function() {
+        paragraphs.forEach(function(paragraph) {
+          paragraph.innerHTML = paragraph.textContent;
+        });
+        commentsColumn.innerHTML = "";
+        highlightCounter = 1;
+      });
+
+      function addComment(id) {
+        var commentDiv = document.createElement("div");
+        commentDiv.id = `comment${id}`;
+        commentDiv.innerHTML = `
+          <textarea placeholder="Enter your comment here"></textarea>
+          <button onclick="submitComment('${id}')">Submit</button>
+        `;
+        commentsColumn.appendChild(commentDiv);
+      }
+
+      function submitComment(id) {
+        var commentDiv = document.getElementById(`comment${id}`);
+        console.log(commentDiv)
+        var comment = commentDiv.querySelector("textarea").value;
+        commentDiv.innerHTML = comment;
+      }
+    </script>
+  </body>
+</html>
