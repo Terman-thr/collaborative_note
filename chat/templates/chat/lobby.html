@@ -66,13 +66,13 @@
             );
             paragraph.innerHTML = newHTML;
             highlightCounter++;
-
-
             chatSocket.send(JSON.stringify({
                 'type': 'highlight',
                 'article': newHTML,
-                'highlightCnt': highlightCounter - 1
+                'highlightCnt': highlightCounter,
             }))
+            
+            
 
           });
         }
@@ -123,6 +123,12 @@
             }
             else if (data.type === 'article') {
                 console.log('received article!')
+                paragraphs.forEach(function(paragraph) {
+                let text = paragraph.innerHTML;
+                paragraph.innerHTML = data.article;
+                highlightCounter = data.highlightCnt;
+                console.log(highlightCounter)
+          });
             }
         }
 
