@@ -44,6 +44,13 @@ INSTALLED_APPS = [
     'chat',
 ]
 
+ASGI_APPLICATION = 'mywebsite.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,7 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mywebsite.wsgi.application'
-ASGI_APPLICATION = 'mywebsite.asgi.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
