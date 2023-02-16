@@ -66,14 +66,13 @@
             );
             paragraph.innerHTML = newHTML;
             highlightCounter++;
+
+
             chatSocket.send(JSON.stringify({
                 'type': 'highlight',
                 'article': newHTML,
                 'highlightCnt': highlightCounter,
             }))
-            
-            
-
           });
         }
       });
@@ -81,6 +80,12 @@
       cancelHighlightButton.addEventListener("click", function() {
         paragraphs.forEach(function(paragraph) {
           paragraph.innerHTML = paragraph.textContent;
+          const text = paragraph.textContent;
+          chatSocket.send(JSON.stringify({
+            'type': 'highlight',
+            'article': text,
+            'highlightCnt': 1,
+          }))
         });
         commentsColumn.innerHTML = "";
         highlightCounter = 1;
