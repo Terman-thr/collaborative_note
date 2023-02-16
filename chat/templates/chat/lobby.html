@@ -105,7 +105,8 @@
         var commentDiv = document.getElementById(`comment${id}`);
         console.log(commentDiv)
         var comment = commentDiv.querySelector("textarea").value;
-        commentDiv.innerHTML = comment;
+        var highText = document.getElementById(id).innerText;
+        commentDiv.innerHTML = `<span style="font-size: 10px">Note for "${highText}:"</span><br>${comment}`;
       }
 
 
