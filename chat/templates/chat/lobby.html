@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Lobby</title>
+    <title>Collaborative Note</title>
     <style>
         .text-column {
           width: 70%;
@@ -24,11 +24,10 @@
       </style>
 </head>
 <body>
-    <h1>Let's chat!</h1>
-    <div id="passage">
+    <h1>{{ article.title }}</h1>
+    <div id="passage" class="text-column">
         <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
-            velit ipsum, pulvinar vel nisl vel, congue fringilla elit.
+          {{ article.text }}
         </p>
         <button id="highlight-button">Highlight</button>
         <button id="cancel-highlight-button">Cancel Highlight</button>
@@ -36,10 +35,6 @@
     <div class="comments-column">
 
     </div>
-
-    <form id="form">
-        <input type="text" name="message"/>
-    </form>
     
     <div id="messages">
 
@@ -73,6 +68,7 @@
                 'article': newHTML,
                 'highlightCnt': highlightCounter,
             }))
+
           });
         }
       });
@@ -85,6 +81,9 @@
             'type': 'highlight',
             'article': text,
             'highlightCnt': 1,
+          }))
+          chatSocket.send(JSON.stringify({
+            'type': 'clearNote',
           }))
         });
         commentsColumn.innerHTML = "";
@@ -153,6 +152,10 @@
                 commentDiv.innerHTML = `<span style="font-size: 10px">Note for "${highText}:"</span><br>${data.comment}`;
                 commentsColumn.appendChild(commentDiv);
               }
+            }
+            else if (data.type === 'clear_note') {
+              var comments = document.querySelector('div[id^="comment"]');
+              comments.remove();
             }
         }
 

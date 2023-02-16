@@ -57,6 +57,19 @@ class ChatConsumer(WebsocketConsumer):
                     'message': message
                 }
             )
+        
+        elif type == 'clearNote':
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'clear_note'
+                }
+            )
+
+    def clear_note(self, event):
+        self.send(text_data=json.dumps({
+            'type': 'clear_note'
+        }))
 
 
     def article_text(self, event):
