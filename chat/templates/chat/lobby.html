@@ -107,6 +107,12 @@
         var comment = commentDiv.querySelector("textarea").value;
         var highText = document.getElementById(id).innerText;
         commentDiv.innerHTML = `<span style="font-size: 10px">Note for "${highText}:"</span><br>${comment}`;
+
+        chatSocket.send(JSON.stringify({
+          'type': 'note',
+          'comment': comment,
+          'id': id,
+        }))
       }
 
 
@@ -134,9 +140,22 @@
                 paragraph.innerHTML = data.article;
                 highlightCounter = data.highlightCnt;
                 console.log(highlightCounter)
-          });
+              });
+            }
+            else if (data.type === 'note') {
+              console.log('received note!');
+              const id = data.id;
+              var commentDiv = document.getElementById(`comment${id}`)
+              if (!commentDiv) {
+                var highText = document.getElementById(id).innerText;
+                commentDiv = document.createElement("div");
+                commentDiv.id = `comment${id}`;
+                commentDiv.innerHTML = `<span style="font-size: 10px">Note for "${highText}:"</span><br>${data.comment}`;
+                commentsColumn.appendChild(commentDiv);
+              }
             }
         }
+
 
         let form = document.getElementById('form')
         form.addEventListener('submit', (e) => {

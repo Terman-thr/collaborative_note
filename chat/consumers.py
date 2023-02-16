@@ -25,8 +25,8 @@ class ChatConsumer(WebsocketConsumer):
         if type == 'highlight':
             article = text_data_json['article']
             highlightCnt = text_data_json['highlightCnt']
-            print("article:", article)
-            print("highlightCnt:", highlightCnt)
+            # print("article:", article)
+            # print("highlightCnt:", highlightCnt)
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
@@ -35,7 +35,19 @@ class ChatConsumer(WebsocketConsumer):
                     'highlightCnt': highlightCnt
                 }
             )
-            
+        
+        elif type == 'note':
+            comment = text_data_json['comment']
+            id = text_data_json['id']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'comment_text',
+                    'comment': comment,
+                    'id': id
+                }
+            )
+
         elif type == 'chat':
             message = text_data_json['message']
             async_to_sync(self.channel_layer.group_send)(
@@ -54,6 +66,16 @@ class ChatConsumer(WebsocketConsumer):
             'type': 'article',
             'article': article,
             'highlightCnt': highlightCnt
+        }))
+
+
+    def comment_text(self, event):
+        comment = event['comment']
+        id = event['id']
+        self.send(text_data=json.dumps({
+            'type': 'note',
+            'comment': comment,
+            'id': id
         }))
 
 
